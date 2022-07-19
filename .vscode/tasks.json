@@ -1,0 +1,19 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"runOptions": {
+				"runOn": "folderOpen"
+			},
+			"script": "cypress-ntlm",
+			"problemMatcher": [],
+			"label": "npm: cypress-ntlm",
+			"detail": "Get latest code and startup Cypress UI",
+			"group": {
+				"kind": "test",
+				"isDefault": true
+			}
+		}
+	]
+}

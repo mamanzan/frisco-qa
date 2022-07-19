@@ -1,0 +1,126 @@
+
+stages:
+    - run-tests
+    - collect-results
+    - deploy
+    - email
+
+build:
+  stage: run-tests
+  tags:
+    - frisco-qa
+  script:
+    - npm install
+    - copy cypress-ntlm-tags.js .\node_modules\cypress-cucumber-preprocessor\cypress-tags.js -Force
+    #- npm run qa $QAUser $QAPassword "@Proj"
+    - npm run qa $QAUser $QAPassword
+  cache:
+    paths:
+      - .\node_modules
+  artifacts:
+    paths:
+      - .\cypress\videos
+      - .\cypress\screenshots
+      - .\cypress\results
+  only:
+    - master
+
+publish-videos-screenshots:
+  stage: collect-results
+  tags: 
+    - frisco-qa
+  script:
+    #- rm -r -Force $QAVideos
+    #- rm -r -Force $QAScreenshots
+    #- Remove-Item $QAVideos -Force -Recurse
+    #- Remove-Item $QAScreenshots -Force -Recurse
+    #- Get-ChildItem $QAVideos -Recurse | Remove-Item -Force -Recurse
+    #- Get-ChildItem $QAScreenshots -Recurse | Remove-Item -Force -Recurse
+    - $folderExists = Test-Path -Path $QAVideos #Fails silently but stops the step
+    - If ($folderExists) { $fullPath = (Resolve-Path $QAVideos).ProviderPath; [IO.Directory]::Delete($fullPath, $true)}
+    - $folderExists = Test-Path -Path $QAScreenshots
+    - If ($folderExists) { $fullPath = (Resolve-Path $QAScreenshots).ProviderPath; [IO.Directory]::Delete($fullPath, $true)}
+    - Copy-Item -Path $CI_PROJECT_DIR\cypress\videos -Destination $QAFolder -Recurse -Force
+    - Copy-Item -Path $CI_PROJECT_DIR\cypress\screenshots -Destination $QAFolder -Recurse -Force
+  dependencies:
+    - build
+  only:
+    - master
+
+compile-results-to-file:
+  stage: collect-results
+  tags:
+    - frisco-qa
+  script:
+    #- .\node_modules\.bin\mochawesome-merge .\cypress\results\*.json > mochawesome.json
+    #- .\node_modules\.bin\marge mochawesome.json
+
+    - npm run report:merge
+    - npm run report:generate
+    - $folderExists = Test-Path -Path $QAResults #Fails silently but stops the step
+    - If ($folderExists) { $fullPath = (Resolve-Path $QAResults).ProviderPath; [IO.Directory]::Delete($fullPath, $true)}
+    - Copy-Item -Path $CI_PROJECT_DIR\cypress\results\html -Destination $QAResults -Recurse -Force
+    #- npm install junit-merge
+    #- .\node_modules\.bin\junit-merge -d .\cypress\results
+    #- .\converter.ps1 $CI_PROJECT_DIR\merged-test-results.xml $CI_PROJECT_DIR\xml-html.xslt $CI_PROJECT_DIR\final-results.html
+  cache:
+    paths:
+      - .\node_modules
+  dependencies:
+    - build
+  artifacts:
+    paths:
+      - .\cypress\results\html
+  only:
+    - master
+
+# email:
+#   stage: email
+#   tags:
+#     - frisco-qa-local
+#   script:
+#     - $source = Get-Content -Path "$CI_PROJECT_DIR\final-results.html" -Raw
+#     - $html = New-Object -Com "HTMLFile"
+#     - $html.IHTMLDocument2_write($source)
+#     - $passing = $html.all.tags("h3") | % innerText
+#     - $failing = $html.all.tags("h4") | % innerText
+#     - >
+#       Send-MailMessage 
+#       -From 'FriscoQA <sys_FriscoQA@intel.com>' 
+#       -To 'FriscoQA <sys_FriscoQA@intel.com>' 
+#       -Subject "Frisco QA Test Results - $($passing), $($failing)" 
+#       -SmtpServer 'smtp.intel.com' 
+#       -Body $source -BodyAsHtml
+#   dependencies:
+#     - compile-results-to-file
+#   only:
+#     - master
+
+# docker-try:
+#   tags:
+#     - docker
+#   script:
+#     - docker container prune --force
+#     - docker build -t cypress-cucumber-image --memory 2g .
+#     #https://btburnett.com/2017/03/remove-untagged-images-from-docker-for-windows.html
+#     - docker images | ConvertFrom-String | where { $_.P2 -eq "<none>" } | % { docker rmi $_.P3 }
+#     - docker run --name cypress-cucumber-container cypress-cucumber-image
+#     - docker cp cypress-cucumber-container:/usr/src/app/cypress/screenshots .\screenshots_new
+#     - docker rm cypress-cucumber-container
+#docker cp test:./cypress/videos .\videos
+
+pages:
+  stage: deploy
+  tags:
+    - frisco-qa
+  script:
+    # - npm install -registry https://pixi.intel.com
+    # - npm run build
+    # - ren public .public
+    - mkdir public
+    - xcopy /s .\cypress\results\html .\public
+  artifacts:
+    paths:
+      - public
+  only:
+    - master

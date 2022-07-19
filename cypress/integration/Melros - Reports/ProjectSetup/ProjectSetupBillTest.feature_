@@ -1,0 +1,20 @@
+@billtest
+Feature: ProjectSetup
+
+	Bill Testing Cucumber
+	Scenario: Checking the number of rows in a FA/FAT table.
+		Given the "POR WIF Company Mapping" page is visited
+		When the "Site" dropdown is opened and "Ocotillo" is selected
+		And the "Projects" dropdown is opened and "POR P1274 TI" is selected
+		And the "Scenarios" dropdown is opened and "ScheduleTest" is selected
+		And the "ScenarioProjects" dropdown is opened and "TestPrj_20190213" is selected
+		And the "FA/FAT" dropdown is opened and "TF" is selected
+		# Below the script is testing the quantity of lines in the output
+		Then the "Functional Area" table should display "1" rows
+# New tests
+#Scenario: Check how many rows there are on the CEID table.
+#When I click the "ceid" option from the "PageSelection" toggle
+#Then I should see "0" rows displayed in the "Functional Area" table
+# The above test in the app yields no table. The above testing output passes but is a false positive because the table cannot be found.
+#   ------NEED A TEST THAT FINDS NO TABLE PRESENT AS A RESULT OF FILTERING/TOGGLE--------------
+# https://gitlab.devtools.intel.com/factorylabor/cypress-test-scripts  to see if code is checked in.

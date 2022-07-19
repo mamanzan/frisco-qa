@@ -1,0 +1,17 @@
+{
+	"cucumberautocomplete.steps": ["cypress/integration/**/*.js"],
+	"cucumberautocomplete.syncfeatures": "cypress/integration/**/*.feature",
+	"cucumberautocomplete.strictGherkinCompletion": true,
+	"cucumberautocomplete.strictGherkinValidation": true,
+	"workbench.iconTheme": "vscode-icons",
+	"prettier.useTabs": true,
+	"editor.renderWhitespace": "all",
+	"editor.tabSize": 4,
+	"editor.formatOnSave": true,
+	"editor.insertSpaces": false,
+	"editor.detectIndentation": false,
+	"vsicons.dontShowNewVersionMessage": true,
+	"[javascript]": { //20201028 , now needed because of VSCode update?
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	}
+}

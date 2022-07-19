@@ -1,0 +1,12 @@
+{
+	"testFiles": "**/*.feature",
+	"pageLoadTimeout": 120000,
+	"experimentalFetchPolyfill": true,
+	"watchForFileChanges": false,
+	"reporter": "cypress-multi-reporters",
+	"reporterOptions": {
+		"configFile": "reporter-config.json"
+	},
+	"video": false,
+	"trashAssetsBeforeRuns": true
+}

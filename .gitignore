@@ -1,0 +1,10 @@
+node_modules
+.http-mitm-proxy
+package-lock.json
+cypress/videos/
+cypress/screenshots/
+cypress/results/
+final-results.html
+merged-test-results.xml
+debug.log
+public/
